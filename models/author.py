@@ -4,21 +4,15 @@ class Author:
     def __init__(self, id, name):
         self.id = id
         self.name = name
+
+    @classmethod
+    def get_all(cls):
         conn = get_db_connection()
         cursor = conn.cursor()
-
-        cursor.execute('INSERT OR IGNORE INTO authors (id, name) VALUES (?, ?)', (id, name))
-        conn.commit()
+        cursor.execute('SELECT * FROM authors')
+        authors = cursor.fetchall()
         conn.close()
+        return [cls(author["id"], author["name"]) for author in authors]
 
     def __repr__(self):
-        return f'<Author {self.name}>'
-
-    @property
-    def articles(self):
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM articles WHERE author_id = ?', (self.id,))
-        articles = cursor.fetchall()
-        conn.close()
-        return [article(article['id'], article['title'], article['content'], article['author_id'], article['magazine_id']) for article in articles]
+        return f"Author(id={self.id}, name={self.name})"
